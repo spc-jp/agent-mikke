@@ -3,468 +3,267 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>エージェントみっけ｜AIエージェント設計書ジェネレーター</title>
+<title>エージェントみっけ｜AIエージェント設計ナビ</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Serif+JP:wght@700&display=swap" rel="stylesheet">
 <style>
-  /* ===== リセット・基本設定 ===== */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --navy: #223670;
-    --navy-dark: #162348;
-    --navy-light: #2d4a99;
-    --gold: #D0A900;
-    --gold-light: #f0c800;
+    --main: #1A7FA8;
+    --main-dark: #155f80;
+    --accent: #0E9DC5;
+    --yellow: #FFE066;
+    --yellow-dark: #e6c800;
+    --bg: #EBF7FC;
+    --text: #0D3D52;
+    --subtext: #2E7A96;
     --white: #ffffff;
-    --gray-50: #f8f9fc;
-    --gray-100: #eef0f6;
-    --gray-300: #c8cdd e;
-    --gray-500: #8892a4;
-    --gray-700: #4a5568;
-    --gray-900: #1a202c;
+    --border: #cceaf4;
     --success: #22c55e;
-    --radius: 12px;
-    --radius-sm: 8px;
-    --shadow: 0 4px 24px rgba(34,54,112,0.10);
-    --shadow-lg: 0 8px 40px rgba(34,54,112,0.18);
+    --radius: 14px;
+    --radius-sm: 9px;
+    --shadow: 0 4px 24px rgba(14,157,197,0.10);
+    --shadow-lg: 0 8px 40px rgba(14,157,197,0.22);
   }
 
   body {
     font-family: 'Noto Sans JP', sans-serif;
-    background: var(--gray-50);
-    color: var(--gray-900);
+    background: var(--bg);
+    color: var(--text);
     min-height: 100vh;
     line-height: 1.7;
   }
 
-  /* ===== ヘッダー ===== */
+  /* ヘッダー */
   header {
-    background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 60%, var(--navy-light) 100%);
-    padding: 28px 24px 24px;
+    background: linear-gradient(160deg, #7DD4ED 0%, #B8E8F5 50%, #E8F7FC 100%);
+    padding: 36px 24px 32px;
     text-align: center;
     position: relative;
     overflow: hidden;
+    border-bottom: 3px solid var(--accent);
   }
   header::before {
     content: '';
     position: absolute;
     top: -40px; right: -40px;
-    width: 200px; height: 200px;
+    width: 220px; height: 220px;
     border-radius: 50%;
-    background: rgba(208,169,0,0.12);
+    background: rgba(255,224,102,0.22);
   }
   header::after {
     content: '';
     position: absolute;
     bottom: -60px; left: -30px;
-    width: 160px; height: 160px;
+    width: 180px; height: 180px;
     border-radius: 50%;
-    background: rgba(208,169,0,0.08);
+    background: rgba(14,157,197,0.12);
   }
   .header-badge {
     display: inline-block;
-    background: var(--gold);
-    color: var(--navy-dark);
+    background: var(--yellow);
+    color: var(--main-dark);
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.08em;
-    padding: 4px 14px;
+    padding: 4px 16px;
     border-radius: 20px;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 8px rgba(230,200,0,0.30);
+    position: relative; z-index: 1;
   }
   header h1 {
     font-family: 'Noto Serif JP', serif;
-    font-size: clamp(22px, 5vw, 32px);
-    color: var(--white);
+    font-size: clamp(24px, 5vw, 34px);
+    color: var(--text);
     letter-spacing: 0.04em;
-    margin-bottom: 8px;
-    position: relative;
-    z-index: 1;
+    margin-bottom: 6px;
+    position: relative; z-index: 1;
   }
-  header h1 span {
-    color: var(--gold);
+  header h1 span { color: var(--main); }
+  .header-catch {
+    color: var(--main-dark);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+    position: relative; z-index: 1;
   }
-  header p {
-    color: rgba(255,255,255,0.75);
+  .header-sub {
+    color: var(--subtext);
     font-size: 13px;
-    position: relative;
-    z-index: 1;
+    position: relative; z-index: 1;
   }
 
-  /* ===== メインレイアウト ===== */
-  main {
-    max-width: 860px;
-    margin: 0 auto;
-    padding: 32px 16px 80px;
-  }
+  /* メイン */
+  main { max-width: 860px; margin: 0 auto; padding: 32px 16px 80px; }
 
-  /* ===== ステップ表示 ===== */
-  .steps-bar {
-    display: flex;
-    justify-content: center;
-    gap: 0;
-    margin-bottom: 32px;
-  }
-  .step-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 12px;
-    color: var(--gray-500);
-    font-weight: 500;
-  }
-  .step-item.active { color: var(--navy); }
-  .step-item.done { color: var(--success); }
+  /* ステップバー */
+  .steps-bar { display: flex; justify-content: center; margin-bottom: 32px; }
+  .step-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--subtext); font-weight: 500; }
+  .step-item.active { color: var(--main); }
   .step-num {
-    width: 28px; height: 28px;
-    border-radius: 50%;
-    background: var(--gray-100);
-    color: var(--gray-500);
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--border); color: var(--subtext);
     display: flex; align-items: center; justify-content: center;
-    font-size: 12px; font-weight: 700;
-    flex-shrink: 0;
+    font-size: 12px; font-weight: 700; flex-shrink: 0;
   }
-  .step-item.active .step-num {
-    background: var(--navy);
-    color: var(--white);
-  }
-  .step-item.done .step-num {
-    background: var(--success);
-    color: var(--white);
-  }
-  .step-line {
-    width: 32px; height: 2px;
-    background: var(--gray-100);
-    margin: 0 4px;
-  }
+  .step-item.active .step-num { background: var(--main); color: var(--white); }
+  .step-line { width: 24px; height: 2px; background: var(--border); margin: 0 2px; }
 
-  /* ===== セクションカード ===== */
+  /* カード */
   .section-card {
     background: var(--white);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     padding: 28px 28px 24px;
     margin-bottom: 20px;
-    border-left: 4px solid var(--navy);
-    transition: box-shadow 0.2s;
+    border-left: 4px solid var(--main);
+    transition: box-shadow 0.2s, border-left-color 0.2s;
   }
-  .section-card:hover { box-shadow: var(--shadow-lg); }
-  .section-card.gold-border { border-left-color: var(--gold); }
+  .section-card:hover { box-shadow: var(--shadow-lg); border-left-color: var(--yellow-dark); }
+  .section-card.yellow-border { border-left-color: var(--yellow-dark); }
+  .section-card.yellow-border:hover { border-left-color: var(--accent); }
 
-  .section-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 20px;
-  }
+  .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
   .section-icon {
-    width: 40px; height: 40px;
-    background: linear-gradient(135deg, var(--navy), var(--navy-light));
-    border-radius: 10px;
+    width: 42px; height: 42px;
+    background: linear-gradient(135deg, var(--main), var(--accent));
+    border-radius: 11px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
-    flex-shrink: 0;
+    font-size: 19px; flex-shrink: 0;
+    box-shadow: 0 3px 10px rgba(14,157,197,0.25);
   }
-  .section-title {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--navy);
-    line-height: 1.3;
-  }
-  .section-sub {
-    font-size: 12px;
-    color: var(--gray-500);
-    margin-top: 2px;
-  }
+  .section-title { font-size: 16px; font-weight: 700; color: var(--main-dark); line-height: 1.3; }
+  .section-sub { font-size: 12px; color: var(--subtext); margin-top: 2px; }
 
-  /* ===== フォーム部品 ===== */
+  /* フォーム */
   .form-group { margin-bottom: 18px; }
   .form-group:last-child { margin-bottom: 0; }
+  label { display: block; font-size: 13px; font-weight: 700; color: var(--main-dark); margin-bottom: 6px; }
+  label .required { color: var(--accent); margin-left: 4px; font-size: 11px; }
+  label .hint { font-weight: 400; color: var(--subtext); font-size: 11px; margin-left: 6px; }
 
-  label {
-    display: block;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--navy);
-    margin-bottom: 6px;
+  input[type="text"], textarea {
+    width: 100%; padding: 11px 14px;
+    border: 2px solid var(--border); border-radius: var(--radius-sm);
+    font-family: 'Noto Sans JP', sans-serif; font-size: 14px;
+    color: var(--text); background: var(--bg);
+    transition: border-color 0.2s, background 0.2s; outline: none; resize: vertical;
   }
-  label .required {
-    color: var(--gold);
-    margin-left: 4px;
-    font-size: 11px;
-  }
-  label .hint {
-    font-weight: 400;
-    color: var(--gray-500);
-    font-size: 11px;
-    margin-left: 6px;
-  }
-
-  input[type="text"],
-  textarea,
-  select {
-    width: 100%;
-    padding: 11px 14px;
-    border: 2px solid var(--gray-100);
-    border-radius: var(--radius-sm);
-    font-family: 'Noto Sans JP', sans-serif;
-    font-size: 14px;
-    color: var(--gray-900);
-    background: var(--gray-50);
-    transition: border-color 0.2s, background 0.2s;
-    outline: none;
-    resize: vertical;
-  }
-  input[type="text"]:focus,
-  textarea:focus,
-  select:focus {
-    border-color: var(--navy);
-    background: var(--white);
-  }
+  input[type="text"]:focus, textarea:focus { border-color: var(--accent); background: var(--white); }
   textarea { min-height: 90px; }
 
-  /* ===== チェックボックスグループ ===== */
-  .checkbox-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 8px;
-  }
+  /* チェックボックス */
+  .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; }
   .checkbox-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    border: 2px solid var(--gray-100);
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    transition: all 0.2s;
-    font-size: 13px;
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 12px; border: 2px solid var(--border); border-radius: var(--radius-sm);
+    cursor: pointer; transition: all 0.2s; font-size: 13px; color: var(--text); background: var(--bg);
   }
-  .checkbox-item:hover { border-color: var(--navy-light); background: var(--gray-50); }
-  .checkbox-item input[type="checkbox"] { accent-color: var(--navy); width: 16px; height: 16px; }
-  .checkbox-item.checked { border-color: var(--navy); background: rgba(34,54,112,0.04); }
+  .checkbox-item:hover { border-color: var(--accent); background: #d6f0f9; }
+  .checkbox-item input[type="checkbox"] { accent-color: var(--main); width: 16px; height: 16px; }
+  .checkbox-item.checked { border-color: var(--main); background: #d0ecf7; }
 
-  /* ===== ラジオボタングループ ===== */
-  .radio-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 8px;
-  }
+  /* ラジオ */
+  .radio-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; }
   .radio-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    border: 2px solid var(--gray-100);
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    transition: all 0.2s;
-    font-size: 13px;
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 12px; border: 2px solid var(--border); border-radius: var(--radius-sm);
+    cursor: pointer; transition: all 0.2s; font-size: 13px; color: var(--text); background: var(--bg);
   }
-  .radio-item:hover { border-color: var(--navy-light); }
-  .radio-item input[type="radio"] { accent-color: var(--navy); width: 16px; height: 16px; }
-  .radio-item.selected { border-color: var(--navy); background: rgba(34,54,112,0.04); }
+  .radio-item:hover { border-color: var(--accent); background: #d6f0f9; }
+  .radio-item input[type="radio"] { accent-color: var(--main); width: 16px; height: 16px; }
+  .radio-item.selected { border-color: var(--main); background: #d0ecf7; }
 
-  /* ===== 生成ボタン ===== */
+  /* 生成ボタン */
   .btn-generate {
-    display: block;
-    width: 100%;
-    padding: 18px;
-    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    color: var(--white);
-    border: none;
-    border-radius: var(--radius);
-    font-family: 'Noto Sans JP', sans-serif;
-    font-size: 17px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    cursor: pointer;
-    transition: all 0.2s;
-    box-shadow: 0 4px 16px rgba(34,54,112,0.3);
-    margin-bottom: 12px;
+    display: block; width: 100%; padding: 18px;
+    background: linear-gradient(135deg, var(--main) 0%, var(--accent) 100%);
+    color: var(--white); border: none; border-radius: var(--radius);
+    font-family: 'Noto Sans JP', sans-serif; font-size: 17px; font-weight: 700;
+    letter-spacing: 0.04em; cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 4px 18px rgba(14,157,197,0.38); margin-bottom: 12px;
   }
-  .btn-generate:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(34,54,112,0.4);
-  }
+  .btn-generate:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(14,157,197,0.48); }
   .btn-generate:active { transform: translateY(0); }
 
-  /* ===== 出力エリア ===== */
-  .output-area {
-    display: none;
-    margin-top: 8px;
-  }
+  /* 出力 */
+  .output-area { display: none; margin-top: 8px; }
   .output-area.visible { display: block; }
-
-  .output-tabs {
-    display: flex;
-    gap: 4px;
-    margin-bottom: -2px;
-    position: relative;
-    z-index: 1;
-  }
+  .output-tabs { display: flex; gap: 4px; margin-bottom: -2px; position: relative; z-index: 1; }
   .tab-btn {
-    padding: 10px 20px;
-    border: 2px solid var(--gray-100);
-    border-bottom: none;
-    background: var(--gray-50);
-    border-radius: 8px 8px 0 0;
-    font-family: 'Noto Sans JP', sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--gray-500);
-    cursor: pointer;
-    transition: all 0.15s;
+    padding: 10px 20px; border: 2px solid var(--border); border-bottom: none;
+    background: var(--bg); border-radius: 8px 8px 0 0;
+    font-family: 'Noto Sans JP', sans-serif; font-size: 13px; font-weight: 700;
+    color: var(--subtext); cursor: pointer; transition: all 0.15s;
   }
-  .tab-btn.active {
-    background: var(--white);
-    color: var(--navy);
-    border-color: var(--gray-100);
-  }
-
-  .output-box {
-    background: var(--white);
-    border: 2px solid var(--gray-100);
-    border-radius: 0 var(--radius) var(--radius) var(--radius);
-    padding: 0;
-    overflow: hidden;
-    box-shadow: var(--shadow);
-  }
-  .output-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 16px;
-    background: var(--gray-50);
-    border-bottom: 1px solid var(--gray-100);
-  }
-  .output-label {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--navy);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
+  .tab-btn.active { background: var(--white); color: var(--main); }
+  .output-box { background: var(--white); border: 2px solid var(--border); border-radius: 0 var(--radius) var(--radius) var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+  .output-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--bg); border-bottom: 1px solid var(--border); }
+  .output-label { font-size: 12px; font-weight: 700; color: var(--main-dark); }
   .btn-copy {
-    padding: 6px 16px;
-    background: var(--navy);
-    color: var(--white);
-    border: none;
-    border-radius: 6px;
-    font-family: 'Noto Sans JP', sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.15s;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    padding: 6px 16px; background: var(--main); color: var(--white); border: none;
+    border-radius: 6px; font-family: 'Noto Sans JP', sans-serif; font-size: 12px;
+    font-weight: 700; cursor: pointer; transition: all 0.15s;
   }
-  .btn-copy:hover { background: var(--navy-light); }
+  .btn-copy:hover { background: var(--accent); }
   .btn-copy.copied { background: var(--success); }
-
   .output-content {
-    padding: 20px;
-    font-size: 13px;
-    line-height: 1.8;
-    white-space: pre-wrap;
-    font-family: 'Courier New', monospace;
-    color: var(--gray-700);
-    max-height: 480px;
-    overflow-y: auto;
-    tab-size: 2;
+    padding: 20px; font-size: 13px; line-height: 1.8; white-space: pre-wrap;
+    font-family: 'Courier New', monospace; color: var(--text); max-height: 480px; overflow-y: auto;
   }
 
-  /* ===== 完了メッセージ ===== */
+  /* 完了バナー */
   .success-banner {
-    display: none;
-    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
-    border: 2px solid var(--success);
-    border-radius: var(--radius);
-    padding: 16px 20px;
-    margin-bottom: 20px;
-    text-align: center;
-    font-size: 14px;
-    font-weight: 700;
-    color: #15803d;
+    display: none; background: linear-gradient(135deg, #e0f7e9, #ccf2da);
+    border: 2px solid var(--success); border-radius: var(--radius);
+    padding: 16px 20px; margin-bottom: 20px; text-align: center;
+    font-size: 14px; font-weight: 700; color: #15803d;
   }
   .success-banner.visible { display: block; }
 
-  /* ===== フッター ===== */
-  footer {
-    text-align: center;
-    padding: 24px;
-    font-size: 12px;
-    color: var(--gray-500);
-    border-top: 1px solid var(--gray-100);
-  }
-  footer span { color: var(--navy); font-weight: 700; }
+  /* フッター */
+  footer { text-align: center; padding: 24px; font-size: 12px; color: var(--subtext); border-top: 1px solid var(--border); }
+  footer span { color: var(--main); font-weight: 700; }
 
-  /* ===== スマホ対応 ===== */
   @media (max-width: 600px) {
     .section-card { padding: 20px 16px; }
     .checkbox-grid { grid-template-columns: 1fr 1fr; }
     .radio-grid { grid-template-columns: 1fr 1fr; }
-    .steps-bar { gap: 0; }
-    .step-line { width: 20px; }
+    .step-line { width: 14px; }
   }
 </style>
 </head>
 <body>
 
-<!-- ヘッダー -->
 <header>
   <div class="header-badge">🤖 AIエージェント設計ナビ</div>
   <h1>エージェント<span>みっけ</span></h1>
-  <p style="color:var(--gold);font-weight:700;font-size:15px;margin-bottom:6px;letter-spacing:0.06em;">AIエージェント設計ナビ</p>
-  <p>6つの質問に答えるだけで CLAUDE.md と指示プロンプトを自動生成します</p>
+  <div class="header-catch">AIエージェント設計ナビ</div>
+  <p class="header-sub">6つの質問に答えるだけで CLAUDE.md と指示プロンプトを自動生成します</p>
 </header>
 
-<!-- メイン -->
 <main>
 
-  <!-- ステップバー -->
   <div class="steps-bar">
-    <div class="step-item active" id="step1-indicator">
-      <div class="step-num">1</div>
-      <span>目的</span>
-    </div>
+    <div class="step-item active"><div class="step-num">1</div><span>目的</span></div>
     <div class="step-line"></div>
-    <div class="step-item" id="step2-indicator">
-      <div class="step-num">2</div>
-      <span>入出力</span>
-    </div>
+    <div class="step-item"><div class="step-num">2</div><span>入出力</span></div>
     <div class="step-line"></div>
-    <div class="step-item" id="step3-indicator">
-      <div class="step-num">3</div>
-      <span>利用者</span>
-    </div>
+    <div class="step-item"><div class="step-num">3</div><span>利用者</span></div>
     <div class="step-line"></div>
-    <div class="step-item" id="step4-indicator">
-      <div class="step-num">4</div>
-      <span>運用</span>
-    </div>
+    <div class="step-item"><div class="step-num">4</div><span>運用</span></div>
     <div class="step-line"></div>
-    <div class="step-item" id="step5-indicator">
-      <div class="step-num">5</div>
-      <span>環境</span>
-    </div>
+    <div class="step-item"><div class="step-num">5</div><span>環境</span></div>
     <div class="step-line"></div>
-    <div class="step-item" id="step6-indicator">
-      <div class="step-num">6</div>
-      <span>優先度</span>
-    </div>
+    <div class="step-item"><div class="step-num">6</div><span>優先度</span></div>
   </div>
 
-  <!-- STEP1：目的・ゴール -->
-  <div class="section-card" id="card1">
+  <div class="section-card">
     <div class="section-header">
       <div class="section-icon">🎯</div>
-      <div>
-        <div class="section-title">STEP 1｜目的・ゴール確認</div>
-        <div class="section-sub">どんな作業を自動化したいかを教えてください</div>
-      </div>
+      <div><div class="section-title">STEP 1｜目的・ゴール確認</div><div class="section-sub">どんな作業を自動化したいかを教えてください</div></div>
     </div>
     <div class="form-group">
       <label>アプリ・エージェントの名前（仮でOK）<span class="required">必須</span></label>
@@ -484,39 +283,35 @@
     </div>
   </div>
 
-  <!-- STEP2：入力と出力 -->
-  <div class="section-card" id="card2">
+  <div class="section-card">
     <div class="section-header">
       <div class="section-icon">🔄</div>
-      <div>
-        <div class="section-title">STEP 2｜入力と出力の確認</div>
-        <div class="section-sub">何を入れて何が出てくるかを決めます</div>
-      </div>
+      <div><div class="section-title">STEP 2｜入力と出力の確認</div><div class="section-sub">何を入れて何が出てくるかを決めます</div></div>
     </div>
     <div class="form-group">
       <label>何を入力しますか？<span class="hint">複数選択OK</span></label>
       <div class="checkbox-grid" id="inputTypes">
-        <label class="checkbox-item"><input type="checkbox" value="テキスト・文章" onchange="updateCheckbox(this); autoSave()"> テキスト・文章</label>
-        <label class="checkbox-item"><input type="checkbox" value="画像・写真" onchange="updateCheckbox(this); autoSave()"> 画像・写真</label>
-        <label class="checkbox-item"><input type="checkbox" value="音声・録音" onchange="updateCheckbox(this); autoSave()"> 音声・録音</label>
-        <label class="checkbox-item"><input type="checkbox" value="動画ファイル" onchange="updateCheckbox(this); autoSave()"> 動画ファイル</label>
-        <label class="checkbox-item"><input type="checkbox" value="PDFファイル" onchange="updateCheckbox(this); autoSave()"> PDFファイル</label>
-        <label class="checkbox-item"><input type="checkbox" value="Excelデータ" onchange="updateCheckbox(this); autoSave()"> Excelデータ</label>
-        <label class="checkbox-item"><input type="checkbox" value="URLリンク" onchange="updateCheckbox(this); autoSave()"> URLリンク</label>
-        <label class="checkbox-item"><input type="checkbox" value="フォーム入力" onchange="updateCheckbox(this); autoSave()"> フォーム入力</label>
+        <label class="checkbox-item"><input type="checkbox" value="テキスト・文章" onchange="updateCheckbox(this);autoSave()"> テキスト・文章</label>
+        <label class="checkbox-item"><input type="checkbox" value="画像・写真" onchange="updateCheckbox(this);autoSave()"> 画像・写真</label>
+        <label class="checkbox-item"><input type="checkbox" value="音声・録音" onchange="updateCheckbox(this);autoSave()"> 音声・録音</label>
+        <label class="checkbox-item"><input type="checkbox" value="動画ファイル" onchange="updateCheckbox(this);autoSave()"> 動画ファイル</label>
+        <label class="checkbox-item"><input type="checkbox" value="PDFファイル" onchange="updateCheckbox(this);autoSave()"> PDFファイル</label>
+        <label class="checkbox-item"><input type="checkbox" value="Excelデータ" onchange="updateCheckbox(this);autoSave()"> Excelデータ</label>
+        <label class="checkbox-item"><input type="checkbox" value="URLリンク" onchange="updateCheckbox(this);autoSave()"> URLリンク</label>
+        <label class="checkbox-item"><input type="checkbox" value="フォーム入力" onchange="updateCheckbox(this);autoSave()"> フォーム入力</label>
       </div>
     </div>
     <div class="form-group">
       <label>何が出てきてほしいですか？<span class="hint">複数選択OK</span></label>
       <div class="checkbox-grid" id="outputTypes">
-        <label class="checkbox-item"><input type="checkbox" value="議事録・要約文" onchange="updateCheckbox(this); autoSave()"> 議事録・要約文</label>
-        <label class="checkbox-item"><input type="checkbox" value="SNS投稿文" onchange="updateCheckbox(this); autoSave()"> SNS投稿文</label>
-        <label class="checkbox-item"><input type="checkbox" value="提案書・企画書" onchange="updateCheckbox(this); autoSave()"> 提案書・企画書</label>
-        <label class="checkbox-item"><input type="checkbox" value="メール文章" onchange="updateCheckbox(this); autoSave()"> メール文章</label>
-        <label class="checkbox-item"><input type="checkbox" value="HTMLファイル" onchange="updateCheckbox(this); autoSave()"> HTMLファイル</label>
-        <label class="checkbox-item"><input type="checkbox" value="Excelシート" onchange="updateCheckbox(this); autoSave()"> Excelシート</label>
-        <label class="checkbox-item"><input type="checkbox" value="PDFレポート" onchange="updateCheckbox(this); autoSave()"> PDFレポート</label>
-        <label class="checkbox-item"><input type="checkbox" value="LINE・チャット配信文" onchange="updateCheckbox(this); autoSave()"> LINE・チャット配信文</label>
+        <label class="checkbox-item"><input type="checkbox" value="議事録・要約文" onchange="updateCheckbox(this);autoSave()"> 議事録・要約文</label>
+        <label class="checkbox-item"><input type="checkbox" value="SNS投稿文" onchange="updateCheckbox(this);autoSave()"> SNS投稿文</label>
+        <label class="checkbox-item"><input type="checkbox" value="提案書・企画書" onchange="updateCheckbox(this);autoSave()"> 提案書・企画書</label>
+        <label class="checkbox-item"><input type="checkbox" value="メール文章" onchange="updateCheckbox(this);autoSave()"> メール文章</label>
+        <label class="checkbox-item"><input type="checkbox" value="HTMLファイル" onchange="updateCheckbox(this);autoSave()"> HTMLファイル</label>
+        <label class="checkbox-item"><input type="checkbox" value="Excelシート" onchange="updateCheckbox(this);autoSave()"> Excelシート</label>
+        <label class="checkbox-item"><input type="checkbox" value="PDFレポート" onchange="updateCheckbox(this);autoSave()"> PDFレポート</label>
+        <label class="checkbox-item"><input type="checkbox" value="LINE・チャット配信文" onchange="updateCheckbox(this);autoSave()"> LINE・チャット配信文</label>
       </div>
     </div>
     <div class="form-group">
@@ -525,133 +320,117 @@
     </div>
   </div>
 
-  <!-- STEP3：利用者 -->
-  <div class="section-card" id="card3">
+  <div class="section-card">
     <div class="section-header">
       <div class="section-icon">👤</div>
-      <div>
-        <div class="section-title">STEP 3｜利用者の確認</div>
-        <div class="section-sub">誰がどんな環境で使うかを教えてください</div>
-      </div>
+      <div><div class="section-title">STEP 3｜利用者の確認</div><div class="section-sub">誰がどんな環境で使うかを教えてください</div></div>
     </div>
     <div class="form-group">
       <label>使うのは誰ですか？</label>
-      <div class="radio-grid" id="users">
-        <label class="radio-item"><input type="radio" name="users" value="自分だけ" onchange="updateRadio(this); autoSave()"> 自分だけ</label>
-        <label class="radio-item"><input type="radio" name="users" value="自分とスタッフ" onchange="updateRadio(this); autoSave()"> 自分とスタッフ</label>
-        <label class="radio-item"><input type="radio" name="users" value="お客様も使う" onchange="updateRadio(this); autoSave()"> お客様も使う</label>
-        <label class="radio-item"><input type="radio" name="users" value="不特定多数" onchange="updateRadio(this); autoSave()"> 不特定多数</label>
+      <div class="radio-grid">
+        <label class="radio-item"><input type="radio" name="users" value="自分だけ" onchange="updateRadio(this);autoSave()"> 自分だけ</label>
+        <label class="radio-item"><input type="radio" name="users" value="自分とスタッフ" onchange="updateRadio(this);autoSave()"> 自分とスタッフ</label>
+        <label class="radio-item"><input type="radio" name="users" value="お客様も使う" onchange="updateRadio(this);autoSave()"> お客様も使う</label>
+        <label class="radio-item"><input type="radio" name="users" value="不特定多数" onchange="updateRadio(this);autoSave()"> 不特定多数</label>
       </div>
     </div>
     <div class="form-group">
       <label>ITリテラシーはどのくらいですか？</label>
-      <div class="radio-grid" id="itLevel">
-        <label class="radio-item"><input type="radio" name="itLevel" value="初心者（説明なしで使えるUIが必要）" onchange="updateRadio(this); autoSave()"> 初心者</label>
-        <label class="radio-item"><input type="radio" name="itLevel" value="中級者（ある程度操作できる）" onchange="updateRadio(this); autoSave()"> 中級者</label>
-        <label class="radio-item"><input type="radio" name="itLevel" value="上級者（技術知識がある）" onchange="updateRadio(this); autoSave()"> 上級者</label>
+      <div class="radio-grid">
+        <label class="radio-item"><input type="radio" name="itLevel" value="初心者（説明なしで使えるUIが必要）" onchange="updateRadio(this);autoSave()"> 初心者</label>
+        <label class="radio-item"><input type="radio" name="itLevel" value="中級者（ある程度操作できる）" onchange="updateRadio(this);autoSave()"> 中級者</label>
+        <label class="radio-item"><input type="radio" name="itLevel" value="上級者（技術知識がある）" onchange="updateRadio(this);autoSave()"> 上級者</label>
       </div>
     </div>
     <div class="form-group">
       <label>主に使う端末は？</label>
-      <div class="radio-grid" id="device">
-        <label class="radio-item"><input type="radio" name="device" value="パソコン中心" onchange="updateRadio(this); autoSave()"> パソコン中心</label>
-        <label class="radio-item"><input type="radio" name="device" value="スマホ中心" onchange="updateRadio(this); autoSave()"> スマホ中心</label>
-        <label class="radio-item"><input type="radio" name="device" value="両方" onchange="updateRadio(this); autoSave()"> 両方</label>
+      <div class="radio-grid">
+        <label class="radio-item"><input type="radio" name="device" value="パソコン中心" onchange="updateRadio(this);autoSave()"> パソコン中心</label>
+        <label class="radio-item"><input type="radio" name="device" value="スマホ中心" onchange="updateRadio(this);autoSave()"> スマホ中心</label>
+        <label class="radio-item"><input type="radio" name="device" value="両方" onchange="updateRadio(this);autoSave()"> 両方</label>
       </div>
     </div>
   </div>
 
-  <!-- STEP4：運用 -->
-  <div class="section-card" id="card4">
+  <div class="section-card">
     <div class="section-header">
       <div class="section-icon">⚙️</div>
-      <div>
-        <div class="section-title">STEP 4｜運用の確認</div>
-        <div class="section-sub">どのように動かしたいかを教えてください</div>
-      </div>
+      <div><div class="section-title">STEP 4｜運用の確認</div><div class="section-sub">どのように動かしたいかを教えてください</div></div>
     </div>
     <div class="form-group">
       <label>使用頻度はどのくらいですか？</label>
-      <div class="radio-grid" id="frequency">
-        <label class="radio-item"><input type="radio" name="frequency" value="毎日複数回" onchange="updateRadio(this); autoSave()"> 毎日複数回</label>
-        <label class="radio-item"><input type="radio" name="frequency" value="週数回" onchange="updateRadio(this); autoSave()"> 週数回</label>
-        <label class="radio-item"><input type="radio" name="frequency" value="月数回" onchange="updateRadio(this); autoSave()"> 月数回</label>
-        <label class="radio-item"><input type="radio" name="frequency" value="不定期" onchange="updateRadio(this); autoSave()"> 不定期</label>
+      <div class="radio-grid">
+        <label class="radio-item"><input type="radio" name="frequency" value="毎日複数回" onchange="updateRadio(this);autoSave()"> 毎日複数回</label>
+        <label class="radio-item"><input type="radio" name="frequency" value="週数回" onchange="updateRadio(this);autoSave()"> 週数回</label>
+        <label class="radio-item"><input type="radio" name="frequency" value="月数回" onchange="updateRadio(this);autoSave()"> 月数回</label>
+        <label class="radio-item"><input type="radio" name="frequency" value="不定期" onchange="updateRadio(this);autoSave()"> 不定期</label>
       </div>
     </div>
     <div class="form-group">
       <label>動かし方はどうしたいですか？</label>
-      <div class="radio-grid" id="operation">
-        <label class="radio-item"><input type="radio" name="operation" value="ボタンを押して手動実行" onchange="updateRadio(this); autoSave()"> ボタンで手動実行</label>
-        <label class="radio-item"><input type="radio" name="operation" value="半自動（確認しながら進む）" onchange="updateRadio(this); autoSave()"> 半自動</label>
-        <label class="radio-item"><input type="radio" name="operation" value="完全自動（定期実行）" onchange="updateRadio(this); autoSave()"> 完全自動</label>
+      <div class="radio-grid">
+        <label class="radio-item"><input type="radio" name="operation" value="ボタンを押して手動実行" onchange="updateRadio(this);autoSave()"> ボタンで手動実行</label>
+        <label class="radio-item"><input type="radio" name="operation" value="半自動（確認しながら進む）" onchange="updateRadio(this);autoSave()"> 半自動</label>
+        <label class="radio-item"><input type="radio" name="operation" value="完全自動（定期実行）" onchange="updateRadio(this);autoSave()"> 完全自動</label>
       </div>
     </div>
     <div class="form-group">
-      <label>結果を誰かに通知する必要はありますか？</label>
+      <label>結果を誰かに通知する必要はありますか？<span class="hint">複数選択OK</span></label>
       <div class="checkbox-grid" id="notify">
-        <label class="checkbox-item"><input type="checkbox" value="メール通知" onchange="updateCheckbox(this); autoSave()"> メール通知</label>
-        <label class="checkbox-item"><input type="checkbox" value="LINE通知" onchange="updateCheckbox(this); autoSave()"> LINE通知</label>
-        <label class="checkbox-item"><input type="checkbox" value="Slack通知" onchange="updateCheckbox(this); autoSave()"> Slack通知</label>
-        <label class="checkbox-item"><input type="checkbox" value="通知不要" onchange="updateCheckbox(this); autoSave()"> 通知不要</label>
+        <label class="checkbox-item"><input type="checkbox" value="メール通知" onchange="updateCheckbox(this);autoSave()"> メール通知</label>
+        <label class="checkbox-item"><input type="checkbox" value="LINE通知" onchange="updateCheckbox(this);autoSave()"> LINE通知</label>
+        <label class="checkbox-item"><input type="checkbox" value="Slack通知" onchange="updateCheckbox(this);autoSave()"> Slack通知</label>
+        <label class="checkbox-item"><input type="checkbox" value="通知不要" onchange="updateCheckbox(this);autoSave()"> 通知不要</label>
       </div>
     </div>
   </div>
 
-  <!-- STEP5：予算・環境 -->
-  <div class="section-card" id="card5">
+  <div class="section-card">
     <div class="section-header">
       <div class="section-icon">💰</div>
-      <div>
-        <div class="section-title">STEP 5｜予算・環境の確認</div>
-        <div class="section-sub">技術環境とコスト感を教えてください</div>
-      </div>
+      <div><div class="section-title">STEP 5｜予算・環境の確認</div><div class="section-sub">技術環境とコスト感を教えてください</div></div>
     </div>
     <div class="form-group">
       <label>月々かけられる費用はどのくらいですか？</label>
-      <div class="radio-grid" id="budget">
-        <label class="radio-item"><input type="radio" name="budget" value="無料のみ" onchange="updateRadio(this); autoSave()"> 無料のみ</label>
-        <label class="radio-item"><input type="radio" name="budget" value="月1,000円以内" onchange="updateRadio(this); autoSave()"> 月1,000円以内</label>
-        <label class="radio-item"><input type="radio" name="budget" value="月5,000円以内" onchange="updateRadio(this); autoSave()"> 月5,000円以内</label>
-        <label class="radio-item"><input type="radio" name="budget" value="月10,000円以上も可" onchange="updateRadio(this); autoSave()"> 月10,000円以上も可</label>
+      <div class="radio-grid">
+        <label class="radio-item"><input type="radio" name="budget" value="無料のみ" onchange="updateRadio(this);autoSave()"> 無料のみ</label>
+        <label class="radio-item"><input type="radio" name="budget" value="月1,000円以内" onchange="updateRadio(this);autoSave()"> 月1,000円以内</label>
+        <label class="radio-item"><input type="radio" name="budget" value="月5,000円以内" onchange="updateRadio(this);autoSave()"> 月5,000円以内</label>
+        <label class="radio-item"><input type="radio" name="budget" value="月10,000円以上も可" onchange="updateRadio(this);autoSave()"> 月10,000円以上も可</label>
       </div>
     </div>
     <div class="form-group">
       <label>使える環境を教えてください<span class="hint">複数選択OK</span></label>
       <div class="checkbox-grid" id="envs">
-        <label class="checkbox-item"><input type="checkbox" value="GitHub Pages" onchange="updateCheckbox(this); autoSave()"> GitHub Pages</label>
-        <label class="checkbox-item"><input type="checkbox" value="Cloudflare Workers" onchange="updateCheckbox(this); autoSave()"> Cloudflare Workers</label>
-        <label class="checkbox-item"><input type="checkbox" value="Claude APIキー" onchange="updateCheckbox(this); autoSave()"> Claude APIキー</label>
-        <label class="checkbox-item"><input type="checkbox" value="ChatGPT APIキー" onchange="updateCheckbox(this); autoSave()"> ChatGPT APIキー</label>
-        <label class="checkbox-item"><input type="checkbox" value="Googleアカウント" onchange="updateCheckbox(this); autoSave()"> Googleアカウント</label>
-        <label class="checkbox-item"><input type="checkbox" value="Windowsパソコン" onchange="updateCheckbox(this); autoSave()"> Windowsパソコン</label>
+        <label class="checkbox-item"><input type="checkbox" value="GitHub Pages" onchange="updateCheckbox(this);autoSave()"> GitHub Pages</label>
+        <label class="checkbox-item"><input type="checkbox" value="Cloudflare Workers" onchange="updateCheckbox(this);autoSave()"> Cloudflare Workers</label>
+        <label class="checkbox-item"><input type="checkbox" value="Claude APIキー" onchange="updateCheckbox(this);autoSave()"> Claude APIキー</label>
+        <label class="checkbox-item"><input type="checkbox" value="ChatGPT APIキー" onchange="updateCheckbox(this);autoSave()"> ChatGPT APIキー</label>
+        <label class="checkbox-item"><input type="checkbox" value="Googleアカウント" onchange="updateCheckbox(this);autoSave()"> Googleアカウント</label>
+        <label class="checkbox-item"><input type="checkbox" value="Windowsパソコン" onchange="updateCheckbox(this);autoSave()"> Windowsパソコン</label>
       </div>
     </div>
     <div class="form-group">
       <label>APIキーの管理は自分でできますか？</label>
-      <div class="radio-grid" id="apiManage">
-        <label class="radio-item"><input type="radio" name="apiManage" value="自分で管理できる" onchange="updateRadio(this); autoSave()"> 自分で管理できる</label>
-        <label class="radio-item"><input type="radio" name="apiManage" value="サポートが必要" onchange="updateRadio(this); autoSave()"> サポートが必要</label>
-        <label class="radio-item"><input type="radio" name="apiManage" value="APIなしで進めたい" onchange="updateRadio(this); autoSave()"> APIなしで進めたい</label>
+      <div class="radio-grid">
+        <label class="radio-item"><input type="radio" name="apiManage" value="自分で管理できる" onchange="updateRadio(this);autoSave()"> 自分で管理できる</label>
+        <label class="radio-item"><input type="radio" name="apiManage" value="サポートが必要" onchange="updateRadio(this);autoSave()"> サポートが必要</label>
+        <label class="radio-item"><input type="radio" name="apiManage" value="APIなしで進めたい" onchange="updateRadio(this);autoSave()"> APIなしで進めたい</label>
       </div>
     </div>
   </div>
 
-  <!-- STEP6：優先順位 -->
-  <div class="section-card gold-border" id="card6">
+  <div class="section-card yellow-border">
     <div class="section-header">
-      <div class="section-icon" style="background: linear-gradient(135deg, var(--gold), #b8940a);">🚀</div>
-      <div>
-        <div class="section-title">STEP 6｜優先順位の確認</div>
-        <div class="section-sub">どのくらいのスピードと規模で進めますか</div>
-      </div>
+      <div class="section-icon" style="background: linear-gradient(135deg, #f5c800, #e6a800);">🚀</div>
+      <div><div class="section-title">STEP 6｜優先順位の確認</div><div class="section-sub">どのくらいのスピードと規模で進めますか</div></div>
     </div>
     <div class="form-group">
       <label>最初のバージョンはどうしたいですか？</label>
-      <div class="radio-grid" id="firstVersion">
-        <label class="radio-item"><input type="radio" name="firstVersion" value="最小限でまず動けばOK（APIなし版）" onchange="updateRadio(this); autoSave()"> まず動けばOK</label>
-        <label class="radio-item"><input type="radio" name="firstVersion" value="ある程度の完成度で公開したい" onchange="updateRadio(this); autoSave()"> ある程度完成させたい</label>
-        <label class="radio-item"><input type="radio" name="firstVersion" value="本格的に作り込みたい" onchange="updateRadio(this); autoSave()"> 本格的に作り込む</label>
+      <div class="radio-grid">
+        <label class="radio-item"><input type="radio" name="firstVersion" value="最小限でまず動けばOK（APIなし版）" onchange="updateRadio(this);autoSave()"> まず動けばOK</label>
+        <label class="radio-item"><input type="radio" name="firstVersion" value="ある程度の完成度で公開したい" onchange="updateRadio(this);autoSave()"> ある程度完成させたい</label>
+        <label class="radio-item"><input type="radio" name="firstVersion" value="本格的に作り込みたい" onchange="updateRadio(this);autoSave()"> 本格的に作り込む</label>
       </div>
     </div>
     <div class="form-group">
@@ -660,30 +439,25 @@
     </div>
     <div class="form-group">
       <label>いつまでに使い始めたいですか？</label>
-      <div class="radio-grid" id="deadline">
-        <label class="radio-item"><input type="radio" name="deadline" value="今すぐ（今日中）" onchange="updateRadio(this); autoSave()"> 今すぐ（今日中）</label>
-        <label class="radio-item"><input type="radio" name="deadline" value="今週中" onchange="updateRadio(this); autoSave()"> 今週中</label>
-        <label class="radio-item"><input type="radio" name="deadline" value="今月中" onchange="updateRadio(this); autoSave()"> 今月中</label>
-        <label class="radio-item"><input type="radio" name="deadline" value="急がない" onchange="updateRadio(this); autoSave()"> 急がない</label>
+      <div class="radio-grid">
+        <label class="radio-item"><input type="radio" name="deadline" value="今すぐ（今日中）" onchange="updateRadio(this);autoSave()"> 今すぐ（今日中）</label>
+        <label class="radio-item"><input type="radio" name="deadline" value="今週中" onchange="updateRadio(this);autoSave()"> 今週中</label>
+        <label class="radio-item"><input type="radio" name="deadline" value="今月中" onchange="updateRadio(this);autoSave()"> 今月中</label>
+        <label class="radio-item"><input type="radio" name="deadline" value="急がない" onchange="updateRadio(this);autoSave()"> 急がない</label>
       </div>
     </div>
     <div class="form-group">
       <label>その他、特に伝えておきたいことはありますか？</label>
-      <textarea id="others" placeholder="例：競合のツールで○○というものがある。SPC（Smile Plus Consulting）のブランドカラーで統一してほしい" oninput="autoSave()" style="min-height:60px;"></textarea>
+      <textarea id="others" placeholder="例：競合のツールで○○というものがある。SPCブランドカラーで統一してほしい" oninput="autoSave()" style="min-height:60px;"></textarea>
     </div>
   </div>
 
-  <!-- 生成ボタン -->
-  <button class="btn-generate" onclick="generate()">
-    ✨ CLAUDE.md と指示プロンプトを生成する
-  </button>
+  <button class="btn-generate" onclick="generate()">✨ CLAUDE.md と指示プロンプトを生成する</button>
 
-  <!-- 完了バナー -->
   <div class="success-banner" id="successBanner">
     ✅ 設計書が完成しました！下のタブからコピーしてClaude Codeに貼り付けてください
   </div>
 
-  <!-- 出力エリア -->
   <div class="output-area" id="outputArea">
     <div class="output-tabs">
       <button class="tab-btn active" onclick="switchTab('claude')" id="tabClaude">📄 CLAUDE.md</button>
@@ -706,284 +480,76 @@
 </footer>
 
 <script>
-// ===== チェックボックス・ラジオのスタイル更新 =====
-function updateCheckbox(el) {
-  el.closest('.checkbox-item').classList.toggle('checked', el.checked);
-}
+function updateCheckbox(el) { el.closest('.checkbox-item').classList.toggle('checked', el.checked); }
 function updateRadio(el) {
-  const name = el.name;
-  document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
-    r.closest('.radio-item').classList.remove('selected');
-  });
+  document.querySelectorAll('input[name="' + el.name + '"]').forEach(r => r.closest('.radio-item').classList.remove('selected'));
   el.closest('.radio-item').classList.add('selected');
 }
-
-// ===== チェック済み値を取得 =====
-function getChecked(containerId) {
-  const vals = [];
-  document.querySelectorAll(`#${containerId} input[type="checkbox"]:checked`).forEach(el => vals.push(el.value));
-  return vals.length ? vals.join('・') : '未選択';
+function getChecked(id) {
+  const v = []; document.querySelectorAll('#' + id + ' input:checked').forEach(e => v.push(e.value));
+  return v.length ? v.join('・') : '未選択';
 }
-function getRadio(name) {
-  const el = document.querySelector(`input[name="${name}"]:checked`);
-  return el ? el.value : '未選択';
-}
-function getVal(id) {
-  const el = document.getElementById(id);
-  return el ? el.value.trim() : '';
-}
-
-// ===== 自動保存 =====
+function getRadio(name) { const e = document.querySelector('input[name="' + name + '"]:checked'); return e ? e.value : '未選択'; }
+function getVal(id) { const e = document.getElementById(id); return e ? e.value.trim() : ''; }
 function autoSave() {
-  const data = {
-    appName: getVal('appName'),
-    purpose: getVal('purpose'),
-    currentWork: getVal('currentWork'),
-    goal: getVal('goal'),
-    outputUsage: getVal('outputUsage'),
-    futureFeatures: getVal('futureFeatures'),
-    others: getVal('others'),
-  };
-  localStorage.setItem('agentMikke_data', JSON.stringify(data));
+  localStorage.setItem('agentMikke_data', JSON.stringify({
+    appName: getVal('appName'), purpose: getVal('purpose'), currentWork: getVal('currentWork'),
+    goal: getVal('goal'), outputUsage: getVal('outputUsage'), futureFeatures: getVal('futureFeatures'), others: getVal('others')
+  }));
 }
-
-// ===== 自動復元 =====
 window.addEventListener('DOMContentLoaded', () => {
-  const saved = localStorage.getItem('agentMikke_data');
-  if (saved) {
-    const data = JSON.parse(saved);
-    Object.keys(data).forEach(id => {
-      const el = document.getElementById(id);
-      if (el && data[id]) el.value = data[id];
-    });
-  }
+  try {
+    const d = JSON.parse(localStorage.getItem('agentMikke_data') || '{}');
+    Object.keys(d).forEach(id => { const e = document.getElementById(id); if (e && d[id]) e.value = d[id]; });
+  } catch(e) {}
 });
 
-// ===== タブ切替 =====
-let currentTab = 'claude';
-let claudeMdText = '';
-let promptText = '';
-
+let currentTab = 'claude', claudeMdText = '', promptText = '';
 function switchTab(tab) {
   currentTab = tab;
   document.getElementById('tabClaude').classList.toggle('active', tab === 'claude');
   document.getElementById('tabPrompt').classList.toggle('active', tab === 'prompt');
-  if (tab === 'claude') {
-    document.getElementById('outputContent').textContent = claudeMdText;
-    document.getElementById('outputLabel').textContent = '📄 CLAUDE.md — Claude Codeのプロジェクト設定ファイル';
-  } else {
-    document.getElementById('outputContent').textContent = promptText;
-    document.getElementById('outputLabel').textContent = '💬 指示プロンプト — Claude Codeへの最初の指示';
-  }
-  document.getElementById('copyBtn').textContent = '📋 全コピー';
-  document.getElementById('copyBtn').classList.remove('copied');
+  document.getElementById('outputContent').textContent = tab === 'claude' ? claudeMdText : promptText;
+  document.getElementById('outputLabel').textContent = tab === 'claude'
+    ? '📄 CLAUDE.md — Claude Codeのプロジェクト設定ファイル'
+    : '💬 指示プロンプト — Claude Codeへの最初の指示';
+  const btn = document.getElementById('copyBtn');
+  btn.textContent = '📋 全コピー'; btn.classList.remove('copied');
 }
-
-// ===== コピー =====
 function copyOutput() {
-  const text = currentTab === 'claude' ? claudeMdText : promptText;
-  navigator.clipboard.writeText(text).then(() => {
+  navigator.clipboard.writeText(currentTab === 'claude' ? claudeMdText : promptText).then(() => {
     const btn = document.getElementById('copyBtn');
-    btn.textContent = '✅ コピーしました！';
-    btn.classList.add('copied');
-    setTimeout(() => {
-      btn.textContent = '📋 全コピー';
-      btn.classList.remove('copied');
-    }, 2500);
+    btn.textContent = '✅ コピーしました！'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 全コピー'; btn.classList.remove('copied'); }, 2500);
   });
 }
-
-// ===== メイン生成処理 =====
 function generate() {
-  const appName       = getVal('appName') || 'AIエージェント';
-  const purpose       = getVal('purpose') || '未入力';
-  const currentWork   = getVal('currentWork') || '未入力';
-  const goal          = getVal('goal') || '未入力';
-  const inputTypes    = getChecked('inputTypes');
-  const outputTypes   = getChecked('outputTypes');
-  const outputUsage   = getVal('outputUsage') || '未入力';
-  const users         = getRadio('users');
-  const itLevel       = getRadio('itLevel');
-  const device        = getRadio('device');
-  const frequency     = getRadio('frequency');
-  const operation     = getRadio('operation');
-  const notify        = getChecked('notify');
-  const budget        = getRadio('budget');
-  const envs          = getChecked('envs');
-  const apiManage     = getRadio('apiManage');
-  const firstVersion  = getRadio('firstVersion');
-  const futureFeatures= getVal('futureFeatures') || '特になし';
-  const deadline      = getRadio('deadline');
-  const others        = getVal('others') || '特になし';
-
+  const appName = getVal('appName') || 'AIエージェント';
+  const purpose = getVal('purpose') || '未入力';
+  const currentWork = getVal('currentWork') || '未入力';
+  const goal = getVal('goal') || '未入力';
+  const inputTypes = getChecked('inputTypes');
+  const outputTypes = getChecked('outputTypes');
+  const outputUsage = getVal('outputUsage') || '未入力';
+  const users = getRadio('users');
+  const itLevel = getRadio('itLevel');
+  const device = getRadio('device');
+  const frequency = getRadio('frequency');
+  const operation = getRadio('operation');
+  const notify = getChecked('notify');
+  const budget = getRadio('budget');
+  const envs = getChecked('envs');
+  const apiManage = getRadio('apiManage');
+  const firstVersion = getRadio('firstVersion');
+  const futureFeatures = getVal('futureFeatures') || '特になし';
+  const deadline = getRadio('deadline');
+  const others = getVal('others') || '特になし';
   const today = new Date().toLocaleDateString('ja-JP');
 
-  // ===== CLAUDE.md 生成 =====
-  claudeMdText = `# ${appName} — CLAUDE.md
-作成日：${today}
-作成ツール：エージェントみっけ（Smile Plus Consulting）
+  claudeMdText = '# ' + appName + ' — CLAUDE.md\n作成日：' + today + '\n作成ツール：エージェントみっけ（Smile Plus Consulting）\n\n---\n\n## プロジェクト概要\n\n### 目的\n' + purpose + '\n\n### 現状の作業フロー\n' + currentWork + '\n\n### 実現したいゴール\n' + goal + '\n\n---\n\n## 機能仕様\n\n### 入力データ\n' + inputTypes + '\n\n### 出力データ\n' + outputTypes + '\n\n### 出力の用途・使用場所\n' + outputUsage + '\n\n---\n\n## 利用者・環境\n\n### 対象ユーザー\n' + users + '\n\n### ITリテラシーレベル\n' + itLevel + '\n\n### 主要デバイス\n' + device + '\n\n---\n\n## 運用・動作設計\n\n### 使用頻度\n' + frequency + '\n\n### 実行方式\n' + operation + '\n\n### 通知設定\n' + notify + '\n\n---\n\n## 技術・予算\n\n### 月次予算\n' + budget + '\n\n### 使用環境・インフラ\n' + envs + '\n\n### APIキー管理\n' + apiManage + '\n\n---\n\n## 開発方針\n\n### 初期バージョン\n' + firstVersion + '\n\n### 将来の拡張計画\n' + futureFeatures + '\n\n### リリース目標\n' + deadline + '\n\n---\n\n## デザイン仕様\n\n- メインカラー：スカイブルー #1A7FA8\n- アクセント：シアン #0E9DC5\n- 強調色：イエロー #FFE066\n- 背景：薄水色 #EBF7FC\n- フォント：Noto Sans JP（Google Fonts CDN）\n- レスポンシブ対応：スマホ・PC両対応\n- 画像処理：Canvas圧縮 1280px JPEG（file.sizeチェック禁止）\n\n---\n\n## 開発スタイル\n\n- HTMLシングルファイルで完結させる\n- 外部ライブラリはCDN読み込みのみ\n- APIなし版を先に公開、後からAPI連携版に育てる\n- GitHub Pages + Cloudflare Workers の無料構成を基本とする\n- コメントは日本語で丁寧に記載する\n- 初心者でも運用できるシンプルなUIを優先する\n\n---\n\n## その他・特記事項\n\n' + others + '\n\n---\n\n*このCLAUDE.mdはエージェントみっけで自動生成されました*\n*Smile Plus Consulting｜考えるを、ひとりにしない*';
 
----
+  promptText = 'このフォルダの中で作業してください。\nCLAUDE.mdを読んで、以下の仕様でアプリを作成してください。\n\n【アプリ名】\n' + appName + '\n\n【最初に作るもの】\n' + firstVersion + '\n\n【入力】\n' + inputTypes + '\n\n【出力】\n' + outputTypes + '\n\n【利用者】\n' + users + '（' + itLevel + '、' + device + '）\n\n【動作方式】\n' + operation + '\n\n【技術構成】\n・HTMLシングルファイル（index.html）で完結させる\n・外部ライブラリはCDN読み込みのみ\n・APIが必要な場合はエンドポイントを定数で定義して後から差し替えられるようにする\n・const WORKER_URL = "https://your-worker.workers.dev/api";\n\n【デザイン】\n・メインカラー：スカイブルー #1A7FA8\n・アクセント：シアン #0E9DC5\n・強調色：イエロー #FFE066\n・背景：薄水色 #EBF7FC\n・フォント：Noto Sans JP（Google Fonts CDN）\n・スマホ・PC両対応のレスポンシブデザイン\n・' + itLevel + 'でも迷わず使えるシンプルなUI\n\n【保存機能】\n・localStorageに入力内容を自動保存\n・ページを開いたとき自動復元\n\n【注意事項】\n・画像処理が必要な場合はCanvas圧縮 1280px JPEG処理を使う\n・file.sizeやbyteSizeのチェックは使わない\n・コメントは日本語で丁寧に記載する\n・完成したらファイルパスを教えてください\n\n【将来の拡張予定】\n' + futureFeatures + '\n\n【その他】\n' + others;
 
-## プロジェクト概要
-
-### 目的
-${purpose}
-
-### 現状の作業フロー
-${currentWork}
-
-### 実現したいゴール
-${goal}
-
----
-
-## 機能仕様
-
-### 入力データ
-${inputTypes}
-
-### 出力データ
-${outputTypes}
-
-### 出力の用途・使用場所
-${outputUsage}
-
----
-
-## 利用者・環境
-
-### 対象ユーザー
-${users}
-
-### ITリテラシーレベル
-${itLevel}
-
-### 主要デバイス
-${device}
-
----
-
-## 運用・動作設計
-
-### 使用頻度
-${frequency}
-
-### 実行方式
-${operation}
-
-### 通知設定
-${notify}
-
----
-
-## 技術・予算
-
-### 月次予算
-${budget}
-
-### 使用環境・インフラ
-${envs}
-
-### APIキー管理
-${apiManage}
-
----
-
-## 開発方針
-
-### 初期バージョン
-${firstVersion}
-
-### 将来の拡張計画
-${futureFeatures}
-
-### リリース目標
-${deadline}
-
----
-
-## デザイン仕様（SPC標準）
-
-- メインカラー：ネイビー #223670
-- アクセントカラー：ゴールド #D0A900
-- フォント：Noto Sans JP（Google Fonts CDN）
-- レスポンシブ対応：スマホ・PC両対応
-- 画像処理：Canvas圧縮 1280px JPEG（file.sizeチェック禁止）
-
----
-
-## 開発スタイル
-
-- HTMLシングルファイルで完結させる
-- 外部ライブラリはCDN読み込みのみ
-- APIなし版を先に公開、後からAPI連携版に育てる
-- GitHub Pages + Cloudflare Workers の無料構成を基本とする
-- コメントは日本語で丁寧に記載する
-- 初心者でも運用できるシンプルなUIを優先する
-
----
-
-## その他・特記事項
-
-${others}
-
----
-
-*このCLAUDE.mdはエージェントみっけで自動生成されました*
-*Smile Plus Consulting｜考えるを、ひとりにしない*`;
-
-  // ===== 指示プロンプト生成 =====
-  promptText = `このフォルダの中で作業してください。
-CLAUDE.mdを読んで、以下の仕様でアプリを作成してください。
-
-【アプリ名】
-${appName}
-
-【最初に作るもの】
-${firstVersion}
-
-【入力】
-${inputTypes}
-
-【出力】
-${outputTypes}
-
-【利用者】
-${users}（${itLevel}、${device}）
-
-【動作方式】
-${operation}
-
-【技術構成】
-・HTMLシングルファイル（index.html）で完結させる
-・外部ライブラリはCDN読み込みのみ
-・APIが必要な場合はエンドポイントを定数で定義して後から差し替えられるようにする
-・const WORKER_URL = "https://your-worker.workers.dev/api";
-
-【デザイン】
-・ネイビー #223670 とゴールド #D0A900 をメインカラーに使う
-・フォントはNoto Sans JP（Google Fonts CDN）
-・スマホ・PC両対応のレスポンシブデザイン
-・${itLevel}でも迷わず使えるシンプルなUI
-
-【保存機能】
-・localStorageに入力内容を自動保存
-・ページを開いたとき自動復元
-
-【注意事項】
-・画像処理が必要な場合はCanvas圧縮 1280px JPEG処理を使う
-・file.sizeやbyteSizeのチェックは使わない
-・コメントは日本語で丁寧に記載する
-・完成したらファイルパスを教えてください
-
-【将来の拡張予定】
-${futureFeatures}
-
-【その他】
-${others}`;
-
-  // 出力エリア表示
   document.getElementById('successBanner').classList.add('visible');
   document.getElementById('outputArea').classList.add('visible');
   document.getElementById('outputContent').textContent = claudeMdText;
@@ -991,11 +557,7 @@ ${others}`;
   document.getElementById('tabClaude').classList.add('active');
   document.getElementById('tabPrompt').classList.remove('active');
   document.getElementById('outputLabel').textContent = '📄 CLAUDE.md — Claude Codeのプロジェクト設定ファイル';
-
-  // スクロール
-  setTimeout(() => {
-    document.getElementById('successBanner').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 100);
+  setTimeout(() => { document.getElementById('successBanner').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
 }
 </script>
 </body>
