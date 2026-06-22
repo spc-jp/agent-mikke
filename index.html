@@ -177,6 +177,60 @@
   .radio-item input[type="radio"] { accent-color: var(--main); width: 16px; height: 16px; }
   .radio-item.selected { border-color: var(--main); background: #d0ecf7; }
 
+
+  /* 生成アニメーション */
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.92); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  @keyframes shimmer {
+    0%   { background-position: -400px 0; }
+    100% { background-position: 400px 0; }
+  }
+  @keyframes pulse-ring {
+    0%   { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(14,157,197,0.5); }
+    70%  { transform: scale(1);    box-shadow: 0 0 0 14px rgba(14,157,197,0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(14,157,197,0); }
+  }
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+
+  .output-area.visible {
+    animation: fadeSlideUp 0.55s cubic-bezier(0.22,1,0.36,1) both;
+  }
+  .success-banner.visible {
+    animation: scaleIn 0.4s cubic-bezier(0.22,1,0.36,1) both;
+  }
+  .output-box {
+    animation: fadeSlideUp 0.6s 0.1s cubic-bezier(0.22,1,0.36,1) both;
+  }
+
+  /* 生成中ボタン */
+  .btn-generate.generating {
+    background: linear-gradient(90deg, #1A7FA8 0%, #0E9DC5 40%, #7DD4ED 60%, #0E9DC5 80%, #1A7FA8 100%);
+    background-size: 400px 100%;
+    animation: shimmer 1.2s linear infinite, pulse-ring 1.4s ease-in-out infinite;
+    pointer-events: none;
+  }
+  .btn-generate .spinner {
+    display: none;
+    width: 18px; height: 18px;
+    border: 3px solid rgba(255,255,255,0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+  .btn-generate.generating .spinner { display: inline-block; }
+  .btn-generate.generating .btn-label { display: none; }
+
   /* 生成ボタン */
   .btn-generate {
     display: block; width: 100%; padding: 18px;
@@ -241,7 +295,6 @@
 <header>
   <div class="header-badge">🤖 AIエージェント設計ナビ</div>
   <h1>エージェント<span>みっけ</span></h1>
-  <div class="header-catch">AIエージェント設計ナビ</div>
   <p class="header-sub">6つの質問に答えるだけで CLAUDE.md と指示プロンプトを自動生成します</p>
 </header>
 
@@ -453,7 +506,7 @@
     </div>
   </div>
 
-  <button class="btn-generate" onclick="generate()">✨ CLAUDE.md と指示プロンプトを生成する</button>
+  <button class="btn-generate" id="generateBtn" onclick="generate()"><span class="spinner"></span><span class="btn-label">✨ CLAUDE.md と指示プロンプトを生成する</span></button>
 
   <div class="success-banner" id="successBanner">
     ✅ 設計書が完成しました！下のタブからコピーしてClaude Codeに貼り付けてください
@@ -525,6 +578,12 @@ function copyOutput() {
   });
 }
 function generate() {
+  // 生成中アニメーション
+  const genBtn = document.getElementById('generateBtn');
+  genBtn.classList.add('generating');
+  genBtn.querySelector('.btn-label').style.display = 'none';
+
+  setTimeout(() => {
   const appName = getVal('appName') || 'AIエージェント';
   const purpose = getVal('purpose') || '未入力';
   const currentWork = getVal('currentWork') || '未入力';
@@ -558,7 +617,12 @@ function generate() {
   document.getElementById('tabClaude').classList.add('active');
   document.getElementById('tabPrompt').classList.remove('active');
   document.getElementById('outputLabel').textContent = '📄 CLAUDE.md — Claude Codeのプロジェクト設定ファイル';
-  setTimeout(() => { document.getElementById('successBanner').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
+    setTimeout(() => { document.getElementById('successBanner').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
+
+    // ボタンを元に戻す
+    genBtn.classList.remove('generating');
+    genBtn.querySelector('.btn-label').style.display = '';
+  }, 600);
 }
 </script>
 </body>
